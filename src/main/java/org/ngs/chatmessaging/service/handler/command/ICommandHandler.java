@@ -1,4 +1,4 @@
-package org.ngs.chatmessaging.service.command;
+package org.ngs.chatmessaging.service.handler.command;
 
 import org.ngs.chatmessaging.dto.SocketCommandDto;
 import org.ngs.chatmessaging.enums.CommandType;

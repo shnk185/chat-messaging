@@ -1,4 +1,4 @@
-package org.ngs.chatmessaging.service;
+package org.ngs.chatmessaging.service.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
-package org.ngs.chatmessaging.service.command;
+package org.ngs.chatmessaging.service.handler.command;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.dto.SocketCommandDto;
-import org.ngs.chatmessaging.dto.commands.UserDto;
+import org.ngs.chatmessaging.dto.UserDto;
 import org.ngs.chatmessaging.dto.commands.client.ClientFetchAllUsersDto;
 import org.ngs.chatmessaging.dto.commands.server.ServerFetchAllUsersResponseDto;
 import org.ngs.chatmessaging.entity.UserEntity;

@@ -3,6 +3,8 @@ package org.ngs.chatmessaging.enums;
 
 public enum CommandType {
     NO_OP,
+    CLIENT_SELF_IDENTIFY,
+    SERVER_SELF_IDENTIFY_RESPONSE,
     CLIENT_REGISTER_USER,
     SERVER_REGISTER_USER_RESPONSE,
     CLIENT_FETCH_ALL_USERS,

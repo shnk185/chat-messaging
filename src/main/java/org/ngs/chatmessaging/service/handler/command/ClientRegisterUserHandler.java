@@ -1,13 +1,12 @@
-package org.ngs.chatmessaging.service.command;
+package org.ngs.chatmessaging.service.handler.command;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.dto.SocketCommandDto;
-import org.ngs.chatmessaging.dto.commands.UserDto;
+import org.ngs.chatmessaging.dto.UserDto;
 import org.ngs.chatmessaging.dto.commands.client.ClientRegisterUserDto;
 import org.ngs.chatmessaging.dto.commands.server.ServerRegisterUserResponseDto;
 import org.ngs.chatmessaging.entity.UserEntity;
 import org.ngs.chatmessaging.enums.CommandType;
-import org.ngs.chatmessaging.service.CommandHandler;
 import org.ngs.chatmessaging.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

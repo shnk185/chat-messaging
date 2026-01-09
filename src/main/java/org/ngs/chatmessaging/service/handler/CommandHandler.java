@@ -1,13 +1,11 @@
-package org.ngs.chatmessaging.service;
+package org.ngs.chatmessaging.service.handler;
 
-import ch.qos.logback.core.util.StringUtil;
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.dto.SocketCommandDto;
 import org.ngs.chatmessaging.enums.CommandType;
-import org.ngs.chatmessaging.service.command.ICommandHandler;
-import org.ngs.chatmessaging.service.command.NoOpHandler;
+import org.ngs.chatmessaging.service.handler.command.ICommandHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;

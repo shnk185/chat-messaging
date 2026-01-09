@@ -1,4 +1,4 @@
-package org.ngs.chatmessaging.dto.commands;
+package org.ngs.chatmessaging.dto.commands.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
-    private String userName;
+public class ClientSelfIdentifyDto {
     private Long userId;
 }

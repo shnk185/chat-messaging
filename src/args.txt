@@ -3,3 +3,9 @@ create user:
 
 fetch all users:
 {"commandType":"CLIENT_FETCH_ALL_USERS","command":{"userId":1}}
+
+self identify:
+{"commandType":"CLIENT_SELF_IDENTIFY","command":{"userId":1}}
+
+create group chat
+{"commandType":"CLIENT_CREATE_CHAT","command":{"chatName":"chat group 1","userIds":[1,2,3]}}
