@@ -1,0 +1,5 @@
+create user:
+{"commandType":"CLIENT_REGISTER_USER","command":{"userName":"user1"}}
+
+fetch all users:
+{"commandType":"CLIENT_FETCH_ALL_USERS","command":{"userId":1}}

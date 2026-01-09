@@ -2,6 +2,7 @@ package org.ngs.chatmessaging.service.command;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.dto.SocketCommandDto;
+import org.ngs.chatmessaging.dto.commands.UserDto;
 import org.ngs.chatmessaging.dto.commands.client.ClientRegisterUserDto;
 import org.ngs.chatmessaging.dto.commands.server.ServerRegisterUserResponseDto;
 import org.ngs.chatmessaging.entity.UserEntity;
@@ -36,8 +37,7 @@ public class ClientRegisterUserHandler implements ICommandHandler {
         log.info("{} parsed command dto: {}", message.getUuid(), clientRegisterUserDto);
         UserEntity userEntity = userService.createUser(clientRegisterUserDto.getUserName());
         ServerRegisterUserResponseDto response = new ServerRegisterUserResponseDto();
-        response.setUserName(userEntity.getUserName());
-        response.setUserId(userEntity.getId());
+        response.setUser(new UserDto(userEntity.getUserName(), userEntity.getId()));
         SocketCommandDto<ServerRegisterUserResponseDto> socketResponse = new SocketCommandDto<>();
         socketResponse.setUuid(message.getUuid());
         socketResponse.setCommandType(CommandType.SERVER_REGISTER_USER_RESPONSE.name());

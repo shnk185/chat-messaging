@@ -9,6 +9,6 @@ import tools.jackson.databind.JsonNode;
 import java.util.Set;
 
 public interface ICommandHandler {
-    public void handle(SocketCommandDto<JsonNode> message, WebSocketSession session, Set<WebSocketSession> sessions);
+    void handle(SocketCommandDto<JsonNode> message, WebSocketSession session, Set<WebSocketSession> sessions);
     CommandType getCommandType();
 }

@@ -5,6 +5,8 @@ import org.ngs.chatmessaging.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -15,5 +17,9 @@ public class UserService {
         UserEntity userEntity = new UserEntity();
         userEntity.setUserName(userName);
         return userRepository.save(userEntity);
+    }
+
+    public List<UserEntity> fetchAllUsers(Long userId) {
+        return userRepository.findAll();
     }
 }
