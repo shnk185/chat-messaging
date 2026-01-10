@@ -28,6 +28,7 @@ public class ClientSelfIdentifyHandler implements ICommandHandler {
     @Override
     public void handle(SocketCommandDto<JsonNode> message, WebSocketSession session, Set<WebSocketSession> sessions) {
         ClientSelfIdentifyDto clientSelfIdentifyDto = objectMapper.treeToValue(message.getCommand(), ClientSelfIdentifyDto.class);
+        log.info("{} parsed command dto {}", message.getUuid(),clientSelfIdentifyDto);
         session.getAttributes().put(WebsocketSessionKeys.SESSION_USER_ID, clientSelfIdentifyDto.getUserId());
         ServerClientSelfIdentifyResponseDto response = new ServerClientSelfIdentifyResponseDto();
         response.setUserId(clientSelfIdentifyDto.getUserId());
