@@ -25,7 +25,7 @@ import java.util.Set;
 @Component
 public class ClientFetchAllPendingMessagesHandler implements ICommandHandler {
 
-    public final CommandType commandType = CommandType.CLIENT_CREATE_CHAT;
+    public final CommandType commandType = CommandType.CLIENT_FETCH_ALL_PENDING_MESSAGES;
 
     @Autowired
     private ObjectMapper objectMapper;

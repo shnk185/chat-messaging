@@ -55,6 +55,7 @@ public class ChatService {
         messageDto.setContent(messageEntity.getContent());
         messageDto.setMessageId(messageEntity.getId());
         messageDto.setUserId(messageEntity.getUserId());
+        messageDto.setChatId(clientSendMessageToChatDto.getChatId());
         messageDto.setContent(messageEntity.getContent());
         messageDto.setReceiverIds(receiverIds);
         return messageDto;

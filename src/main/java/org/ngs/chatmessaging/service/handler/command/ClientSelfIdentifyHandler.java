@@ -34,7 +34,7 @@ public class ClientSelfIdentifyHandler implements ICommandHandler {
         response.setUserId(clientSelfIdentifyDto.getUserId());
         SocketCommandDto<ServerClientSelfIdentifyResponseDto> socketResponse = new SocketCommandDto<>();
         socketResponse.setUuid(message.getUuid());
-        socketResponse.setCommandType(CommandType.SERVER_REGISTER_USER_RESPONSE.name());
+        socketResponse.setCommandType(CommandType.SERVER_SELF_IDENTIFY_RESPONSE.name());
         socketResponse.setCommand(response);
         try {
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketResponse)));

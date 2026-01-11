@@ -9,3 +9,12 @@ self identify:
 
 create group chat
 {"commandType":"CLIENT_CREATE_CHAT","command":{"chatName":"chat group 1","userIds":[1,2,3]}}
+
+send message to chat
+{"commandType":"CLIENT_SEND_MESSAGE_TO_CHAT","command":{"chatId":1,"content":"user 1 welcomes you to the group"}}
+
+acknowledge message receive
+{"commandType":"CLIENT_ACKNOWLEDGE_MESSAGE_RECEIVED","command":{"messageId":1,"chatId":1}}
+
+fetch all pending messages
+{"commandType":"CLIENT_FETCH_ALL_PENDING_MESSAGES","command":{"userId":3}}
