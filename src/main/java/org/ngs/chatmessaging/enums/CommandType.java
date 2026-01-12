@@ -19,7 +19,8 @@ public enum CommandType {
     CLIENT_ACKNOWLEDGE_MESSAGE_RECEIVED,
     SERVER_ACKNOWLEDGE_MESSAGE_RECEIVED_RESPONSE,
     CLIENT_FETCH_ALL_PENDING_MESSAGES,
-    SERVER_FETCH_ALL_PENDING_MESSAGES_RESPONSE;
+    SERVER_FETCH_ALL_PENDING_MESSAGES_RESPONSE,
+    INTERNAL_SEND_MESSAGE_TO_CHAT;
 
     public static CommandType commandFromString(String input) {
         for (CommandType command : CommandType.values()) {

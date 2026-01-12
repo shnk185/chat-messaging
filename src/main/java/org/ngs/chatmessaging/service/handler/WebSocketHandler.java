@@ -3,9 +3,13 @@ package org.ngs.chatmessaging.service.handler;
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.ngs.chatmessaging.constant.WebsocketSessionKeys;
 import org.ngs.chatmessaging.dto.SocketCommandDto;
 import org.ngs.chatmessaging.enums.CommandType;
-import org.ngs.chatmessaging.service.handler.command.ICommandHandler;
+import org.ngs.chatmessaging.service.SessionManager;
+import org.ngs.chatmessaging.service.handler.socket.ICommandHandler;
+import org.ngs.chatmessaging.subscriber.RedisSubscriptionManager;
+import org.ngs.chatmessaging.utils.KeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -18,13 +22,13 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Slf4j
 @Component
 public class WebSocketHandler extends TextWebSocketHandler {
 
-    private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
+    @Autowired
+    private SessionManager sessionManager;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -33,6 +37,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private List<ICommandHandler> allHandlers;
 
     private Map<CommandType, ICommandHandler> commandHandlerMap;
+
+    @Autowired
+    private RedisSubscriptionManager redisSubscriptionManager;
 
     @PostConstruct
     public void setUp() {
@@ -44,7 +51,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        sessions.add(session);
+        sessionManager.addSession(session);
         try {
             session.sendMessage(new TextMessage("Connected to server"));
         } catch (IOException e) {
@@ -56,16 +63,25 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message) {
         String payload = message.getPayload();
         log.info("received command {}", payload);
+        handlePayload(session, payload);
+    }
+
+    public void handlePayload(WebSocketSession session, String payload) {
         SocketCommandDto<JsonNode> socketCommand = objectMapper.readValue(payload, new TypeReference<>() {});
         if (StringUtils.isBlank(socketCommand.getUuid())) {
             socketCommand.setUuid(UUID.randomUUID().toString());
         }
         CommandType commandType = CommandType.commandFromString(socketCommand.getCommandType());
-        commandHandlerMap.get(commandType).handle(socketCommand, session, sessions);
+        commandHandlerMap.get(commandType).handle(socketCommand, session, sessionManager.getAllSessions());
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        sessions.remove(session);
+        if (session.getAttributes().containsKey(WebsocketSessionKeys.SESSION_USER_ID)) {
+            Long sessionUserId = (Long) session.getAttributes().get(WebsocketSessionKeys.SESSION_USER_ID);
+            String topic = KeyUtil.getRedisUserTopicName(sessionUserId);
+            redisSubscriptionManager.unsubscribe(topic);
+        }
+        sessionManager.removeSession(session);
     }
 }

@@ -1,4 +1,4 @@
-package org.ngs.chatmessaging.service.handler.command;
+package org.ngs.chatmessaging.service.handler.socket;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.dto.SocketCommandDto;
