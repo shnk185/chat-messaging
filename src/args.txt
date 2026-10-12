@@ -1,3 +1,6 @@
+in web console of browser:
+ws.send('command in single quotes')
+
 create user:
 {"commandType":"CLIENT_REGISTER_USER","command":{"userName":"user1"}}
 
