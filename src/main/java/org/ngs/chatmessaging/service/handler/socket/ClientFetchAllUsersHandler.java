@@ -1,5 +1,6 @@
 package org.ngs.chatmessaging.service.handler.socket;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.dto.SocketCommandDto;
 import org.ngs.chatmessaging.dto.UserDto;
@@ -8,7 +9,6 @@ import org.ngs.chatmessaging.dto.commands.server.ServerFetchAllUsersResponseDto;
 import org.ngs.chatmessaging.entity.UserEntity;
 import org.ngs.chatmessaging.enums.CommandType;
 import org.ngs.chatmessaging.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -22,21 +22,18 @@ import java.util.Set;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ClientFetchAllUsersHandler implements ICommandHandler {
 
     public final CommandType commandType = CommandType.CLIENT_FETCH_ALL_USERS;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final UserService userService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void handle(SocketCommandDto<JsonNode> message, WebSocketSession session, Set<WebSocketSession> sessions) {
         ClientFetchAllUsersDto clientFetchAllUsersDto = objectMapper.treeToValue(message.getCommand(), ClientFetchAllUsersDto.class);
         log.info("{} parsed command dto: {}", message.getUuid(), clientFetchAllUsersDto);
-        List<UserEntity> userEntityList = userService.fetchAllUsers(clientFetchAllUsersDto.getUserId());
+        List<UserEntity> userEntityList = userService.fetchAllUsers();
         ServerFetchAllUsersResponseDto response = new ServerFetchAllUsersResponseDto();
         List<UserDto> allUserDtos = new ArrayList<>();
         for (UserEntity userEntity: userEntityList) {

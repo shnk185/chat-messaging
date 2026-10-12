@@ -2,6 +2,7 @@ package org.ngs.chatmessaging.service.handler;
 
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.constant.WebsocketSessionKeys;
 import org.ngs.chatmessaging.dto.SocketCommandDto;
@@ -10,7 +11,6 @@ import org.ngs.chatmessaging.service.SessionManager;
 import org.ngs.chatmessaging.service.handler.socket.ICommandHandler;
 import org.ngs.chatmessaging.subscriber.RedisSubscriptionManager;
 import org.ngs.chatmessaging.utils.KeyUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -21,29 +21,24 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class WebSocketHandler extends TextWebSocketHandler {
 
-    @Autowired
-    private SessionManager sessionManager;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private List<ICommandHandler> allHandlers;
-
-    private Map<CommandType, ICommandHandler> commandHandlerMap;
-
-    @Autowired
-    private RedisSubscriptionManager redisSubscriptionManager;
+    private final SessionManager sessionManager;
+    private final ObjectMapper objectMapper;
+    private final List<ICommandHandler> allHandlers;
+    private final Map<CommandType, ICommandHandler> commandHandlerMap = new HashMap<>();
+    private final RedisSubscriptionManager redisSubscriptionManager;
 
     @PostConstruct
     public void setUp() {
-        commandHandlerMap = new HashMap<>();
         for (ICommandHandler handler: allHandlers) {
             commandHandlerMap.put(handler.getCommandType(), handler);
         }

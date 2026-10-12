@@ -2,7 +2,6 @@ package org.ngs.chatmessaging.service.handler.socket;
 
 import org.ngs.chatmessaging.dto.SocketCommandDto;
 import org.ngs.chatmessaging.enums.CommandType;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import tools.jackson.databind.JsonNode;
 

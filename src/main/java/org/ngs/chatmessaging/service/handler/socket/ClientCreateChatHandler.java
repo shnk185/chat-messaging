@@ -1,5 +1,6 @@
 package org.ngs.chatmessaging.service.handler.socket;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.constant.WebsocketSessionKeys;
 import org.ngs.chatmessaging.dto.ChatDto;
@@ -8,7 +9,6 @@ import org.ngs.chatmessaging.dto.commands.client.ClientCreateChatDto;
 import org.ngs.chatmessaging.dto.commands.server.ServerCreateChatResponseDto;
 import org.ngs.chatmessaging.enums.CommandType;
 import org.ngs.chatmessaging.service.ChatManagementService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -21,15 +21,12 @@ import java.util.Set;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ClientCreateChatHandler implements ICommandHandler {
 
     public final CommandType commandType = CommandType.CLIENT_CREATE_CHAT;
-
-    @Autowired
-    private ChatManagementService chatManagementService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ChatManagementService chatManagementService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void handle(SocketCommandDto<JsonNode> message, WebSocketSession session, Set<WebSocketSession> sessions) {

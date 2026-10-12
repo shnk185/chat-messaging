@@ -1,6 +1,7 @@
 package org.ngs.chatmessaging.service;
 
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.ngs.chatmessaging.dto.IncomingMessageDto;
 import org.ngs.chatmessaging.dto.MessageDto;
 import org.ngs.chatmessaging.dto.commands.client.ClientAcknowledgeMessageReceivedDto;
@@ -11,22 +12,17 @@ import org.ngs.chatmessaging.entity.MessageEntity;
 import org.ngs.chatmessaging.repository.ChatMemberRepository;
 import org.ngs.chatmessaging.repository.InboxRepository;
 import org.ngs.chatmessaging.repository.MessageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ChatService {
 
-    @Autowired
-    private MessageRepository messageRepository;
-
-    @Autowired
-    private InboxRepository inboxRepository;
-
-    @Autowired
-    private ChatMemberRepository chatMemberRepository;
+    private final MessageRepository messageRepository;
+    private final InboxRepository inboxRepository;
+    private final ChatMemberRepository chatMemberRepository;
 
     @Transactional
     public MessageDto persistChatMessage(Long senderUserId, ClientSendMessageToChatDto clientSendMessageToChatDto) {

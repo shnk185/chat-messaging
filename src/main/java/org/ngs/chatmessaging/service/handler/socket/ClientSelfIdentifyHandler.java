@@ -1,5 +1,6 @@
 package org.ngs.chatmessaging.service.handler.socket;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.constant.WebsocketSessionKeys;
 import org.ngs.chatmessaging.dto.SocketCommandDto;
@@ -8,7 +9,6 @@ import org.ngs.chatmessaging.dto.commands.server.ServerClientSelfIdentifyRespons
 import org.ngs.chatmessaging.enums.CommandType;
 import org.ngs.chatmessaging.subscriber.RedisSubscriptionManager;
 import org.ngs.chatmessaging.utils.KeyUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -20,15 +20,12 @@ import java.util.Set;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ClientSelfIdentifyHandler implements ICommandHandler {
 
     public final CommandType commandType = CommandType.CLIENT_SELF_IDENTIFY;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private RedisSubscriptionManager redisSubscriptionManager;
+    private final ObjectMapper objectMapper;
+    private final RedisSubscriptionManager redisSubscriptionManager;
 
     @Override
     public void handle(SocketCommandDto<JsonNode> message, WebSocketSession session, Set<WebSocketSession> sessions) {

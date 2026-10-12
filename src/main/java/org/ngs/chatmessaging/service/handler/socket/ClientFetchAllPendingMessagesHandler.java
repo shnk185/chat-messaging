@@ -1,5 +1,6 @@
 package org.ngs.chatmessaging.service.handler.socket;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ngs.chatmessaging.constant.WebsocketSessionKeys;
 import org.ngs.chatmessaging.dto.IncomingMessageDto;
@@ -8,7 +9,6 @@ import org.ngs.chatmessaging.dto.commands.client.ClientFetchAllPendingMessagesDt
 import org.ngs.chatmessaging.dto.commands.server.ServerFetchAllPendingMessagesResponseDto;
 import org.ngs.chatmessaging.enums.CommandType;
 import org.ngs.chatmessaging.service.ChatService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -22,15 +22,12 @@ import java.util.Set;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ClientFetchAllPendingMessagesHandler implements ICommandHandler {
 
     public final CommandType commandType = CommandType.CLIENT_FETCH_ALL_PENDING_MESSAGES;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private ChatService chatService;
+    private final ObjectMapper objectMapper;
+    private final ChatService chatService;
 
     @Override
     public void handle(SocketCommandDto<JsonNode> message, WebSocketSession session, Set<WebSocketSession> sessions) {

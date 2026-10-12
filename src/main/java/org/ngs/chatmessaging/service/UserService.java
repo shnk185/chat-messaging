@@ -1,17 +1,17 @@
 package org.ngs.chatmessaging.service;
 
+import lombok.RequiredArgsConstructor;
 import org.ngs.chatmessaging.entity.UserEntity;
 import org.ngs.chatmessaging.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public UserEntity createUser(String userName) {
         UserEntity userEntity = new UserEntity();
@@ -19,7 +19,7 @@ public class UserService {
         return userRepository.save(userEntity);
     }
 
-    public List<UserEntity> fetchAllUsers(Long userId) {
+    public List<UserEntity> fetchAllUsers() {
         return userRepository.findAll();
     }
 }

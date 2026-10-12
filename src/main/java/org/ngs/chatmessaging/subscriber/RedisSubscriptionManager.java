@@ -1,20 +1,18 @@
 package org.ngs.chatmessaging.subscriber;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class RedisSubscriptionManager {
 
-    @Autowired
-    private RedisMessageListenerContainer container;
-
-    @Autowired
-    private RedisMessageListener redisMessageListener;
+    private final RedisMessageListenerContainer container;
+    private final RedisMessageListener redisMessageListener;
 
     public void subscribe(String topic) {
         container.addMessageListener(redisMessageListener, new ChannelTopic(topic));
