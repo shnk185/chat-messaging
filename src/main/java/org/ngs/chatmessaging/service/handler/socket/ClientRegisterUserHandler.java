@@ -32,12 +32,9 @@ public class ClientRegisterUserHandler implements ICommandHandler {
         ClientRegisterUserDto clientRegisterUserDto = objectMapper.treeToValue(message.getCommand(), ClientRegisterUserDto.class);
         log.info("{} parsed command dto: {}", message.getUuid(), clientRegisterUserDto);
         UserEntity userEntity = userService.createUser(clientRegisterUserDto.getUserName());
-        ServerRegisterUserResponseDto response = new ServerRegisterUserResponseDto();
-        response.setUser(new UserDto(userEntity.getUserName(), userEntity.getId()));
-        SocketCommandDto<ServerRegisterUserResponseDto> socketResponse = new SocketCommandDto<>();
-        socketResponse.setUuid(message.getUuid());
-        socketResponse.setCommandType(CommandType.SERVER_REGISTER_USER_RESPONSE.name());
-        socketResponse.setCommand(response);
+        ServerRegisterUserResponseDto response = new ServerRegisterUserResponseDto(new UserDto(userEntity.getUserName(), userEntity.getId()));
+        SocketCommandDto<ServerRegisterUserResponseDto> socketResponse = new SocketCommandDto<>(message.getUuid(),
+                CommandType.SERVER_REGISTER_USER_RESPONSE.name(), response);
         try {
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketResponse)));
         } catch (IOException e) {

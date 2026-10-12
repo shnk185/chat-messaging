@@ -32,14 +32,10 @@ public class ClientAcknowledgeMessageReceivedHandler implements ICommandHandler 
         log.info("{} parser command dto {}", message.getUuid(), clientAcknowledgeMessageReceivedDto);
         Long receiverId = (Long) session.getAttributes().get(WebsocketSessionKeys.SESSION_USER_ID);
         chatService.processMessageAcknowledge(clientAcknowledgeMessageReceivedDto, receiverId);
-        ServerAcknowledgeMessageReceivedResponseDto response = new ServerAcknowledgeMessageReceivedResponseDto();
-        response.setMessageId(clientAcknowledgeMessageReceivedDto.getMessageId());
-        response.setReceiverId(receiverId);
-        response.setChatId(clientAcknowledgeMessageReceivedDto.getChatId());
-        SocketCommandDto<ServerAcknowledgeMessageReceivedResponseDto> socketResponse = new SocketCommandDto<>();
-        socketResponse.setUuid(message.getUuid());
-        socketResponse.setCommandType(CommandType.SERVER_ACKNOWLEDGE_MESSAGE_RECEIVED_RESPONSE.name());
-        socketResponse.setCommand(response);
+        ServerAcknowledgeMessageReceivedResponseDto response = new ServerAcknowledgeMessageReceivedResponseDto(clientAcknowledgeMessageReceivedDto.getMessageId(),
+                clientAcknowledgeMessageReceivedDto.getChatId(), receiverId);
+        SocketCommandDto<ServerAcknowledgeMessageReceivedResponseDto> socketResponse = new SocketCommandDto<>(message.getUuid(),
+                CommandType.SERVER_ACKNOWLEDGE_MESSAGE_RECEIVED_RESPONSE.name(), response);
         try {
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketResponse)));
         } catch (IOException e) {

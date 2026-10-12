@@ -12,6 +12,7 @@ import org.ngs.chatmessaging.repository.ChatRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,21 +26,12 @@ public class ChatManagementService {
         ChatEntity chatEntity = new ChatEntity(clientCreateChatDto.getChatName());
         chatRepository.save(chatEntity);
 
-        ChatDto chatDto = new ChatDto();
-        chatDto.setChatName(chatEntity.getName());
-        chatDto.setChatId(chatEntity.getId());
-        chatDto.setChatMembers(new ArrayList<>());
-
-
+        List<UserDto> chatMembers = new ArrayList<>();
         for (Long userId: clientCreateChatDto.getUserIds()) {
-            ChatMemberEntity chatMemberEntity = new ChatMemberEntity();
-            chatMemberEntity.setChatId(chatEntity.getId());
-            chatMemberEntity.setUserId(userId);
+            ChatMemberEntity chatMemberEntity = new ChatMemberEntity(userId, chatEntity.getId());
             chatMemberRepository.save(chatMemberEntity);
-            UserDto userDto = new UserDto();
-            userDto.setUserId(userId);
-            chatDto.getChatMembers().add(userDto);
+            chatMembers.add(new UserDto(null, userId));
         }
-        return chatDto;
+        return new ChatDto(chatEntity.getId(), chatEntity.getName(), chatMembers);
     }
 }

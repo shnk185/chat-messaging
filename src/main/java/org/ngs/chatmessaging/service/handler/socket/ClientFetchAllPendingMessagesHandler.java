@@ -35,12 +35,9 @@ public class ClientFetchAllPendingMessagesHandler implements ICommandHandler {
         log.info("{} parsed command dto {}", message.getUuid(), clientFetchAllPendingMessagesDto);
         Long receiverUserId = (Long) session.getAttributes().get(WebsocketSessionKeys.SESSION_USER_ID);
         Map<Long, List<IncomingMessageDto>> pendingMessages = chatService.fetchPendingMessagesForUser(receiverUserId);
-        ServerFetchAllPendingMessagesResponseDto response = new ServerFetchAllPendingMessagesResponseDto();
-        response.setPendingMessages(pendingMessages);
-        SocketCommandDto<ServerFetchAllPendingMessagesResponseDto> socketResponse = new SocketCommandDto<>();
-        socketResponse.setUuid(message.getUuid());
-        socketResponse.setCommandType(CommandType.SERVER_FETCH_ALL_PENDING_MESSAGES_RESPONSE.name());
-        socketResponse.setCommand(response);
+        ServerFetchAllPendingMessagesResponseDto response = new ServerFetchAllPendingMessagesResponseDto(pendingMessages);
+        SocketCommandDto<ServerFetchAllPendingMessagesResponseDto> socketResponse = new SocketCommandDto<>(message.getUuid(),
+                CommandType.SERVER_FETCH_ALL_PENDING_MESSAGES_RESPONSE.name(), response);
         try {
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketResponse)));
         } catch (IOException e) {

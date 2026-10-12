@@ -33,12 +33,9 @@ public class ClientCreateChatHandler implements ICommandHandler {
         ClientCreateChatDto clientCreateChatDto = objectMapper.treeToValue(message.getCommand(), ClientCreateChatDto.class);
         log.info("{} parsed command dto: {}", message.getUuid(), clientCreateChatDto);
         ChatDto chatDto = chatManagementService.createChat(clientCreateChatDto);
-        ServerCreateChatResponseDto response = new ServerCreateChatResponseDto();
-        response.setChatDto(chatDto);
-        SocketCommandDto<ServerCreateChatResponseDto> socketResponse = new SocketCommandDto<>();
-        socketResponse.setUuid(message.getUuid());
-        socketResponse.setCommandType(CommandType.SERVER_CREATE_CHAT_RESPONSE.name());
-        socketResponse.setCommand(response);
+        ServerCreateChatResponseDto response = new ServerCreateChatResponseDto(chatDto);
+        SocketCommandDto<ServerCreateChatResponseDto> socketResponse = new SocketCommandDto<>(message.getUuid(),
+                CommandType.SERVER_CREATE_CHAT_RESPONSE.name(), response);
         Set<Long> chatMembers = new HashSet<>(clientCreateChatDto.getUserIds());
         try {
             for (WebSocketSession userSession: sessions) {

@@ -28,18 +28,12 @@ public class InternalSendMessageToChatHandler implements IInternalCommandHandler
     public void handle(SocketCommandDto<JsonNode> message, Set<WebSocketSession> sessions) {
         InternalSendMessageToChatDto internalSendMessageToChatDto = objectMapper.treeToValue(message.getCommand(), InternalSendMessageToChatDto.class);
         log.info("{} parsed internal command dto {}", message.getUuid(), internalSendMessageToChatDto);
-        IncomingMessageDto incomingMessageDto = new IncomingMessageDto();
-        incomingMessageDto.setMessageId(internalSendMessageToChatDto.getMessageId());
-        incomingMessageDto.setContent(internalSendMessageToChatDto.getContent());
-        incomingMessageDto.setChatId(internalSendMessageToChatDto.getChatId());
-        incomingMessageDto.setReceiverId(internalSendMessageToChatDto.getReceiverId());
-        incomingMessageDto.setSenderId(internalSendMessageToChatDto.getSenderId());
-        ServerPushMessageToChatDto response = new ServerPushMessageToChatDto();
-        response.setIncomingMessage(incomingMessageDto);
-        SocketCommandDto<ServerPushMessageToChatDto> socketResponse = new SocketCommandDto<>();
-        socketResponse.setUuid(message.getUuid());
-        socketResponse.setCommandType(CommandType.SERVER_PUSH_MESSAGE_TO_CHAT.name());
-        socketResponse.setCommand(response);
+        IncomingMessageDto incomingMessageDto = IncomingMessageDto.builder().messageId(internalSendMessageToChatDto.getMessageId())
+                .content(internalSendMessageToChatDto.getContent()).chatId(internalSendMessageToChatDto.getChatId())
+                .receiverId(internalSendMessageToChatDto.getReceiverId()).senderId(internalSendMessageToChatDto.getSenderId()).build();
+        ServerPushMessageToChatDto response = new ServerPushMessageToChatDto(incomingMessageDto);
+        SocketCommandDto<ServerPushMessageToChatDto> socketResponse = new SocketCommandDto<>(message.getUuid(),
+                CommandType.SERVER_PUSH_MESSAGE_TO_CHAT.name(), response);
         for (WebSocketSession userSession: sessions) {
             if (userSession.getAttributes().get(WebsocketSessionKeys.SESSION_USER_ID) == null) continue;
             Long sessionUserId = (Long) userSession.getAttributes().get(WebsocketSessionKeys.SESSION_USER_ID);

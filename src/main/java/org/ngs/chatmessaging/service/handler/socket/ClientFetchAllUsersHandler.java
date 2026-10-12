@@ -34,19 +34,13 @@ public class ClientFetchAllUsersHandler implements ICommandHandler {
         ClientFetchAllUsersDto clientFetchAllUsersDto = objectMapper.treeToValue(message.getCommand(), ClientFetchAllUsersDto.class);
         log.info("{} parsed command dto: {}", message.getUuid(), clientFetchAllUsersDto);
         List<UserEntity> userEntityList = userService.fetchAllUsers();
-        ServerFetchAllUsersResponseDto response = new ServerFetchAllUsersResponseDto();
         List<UserDto> allUserDtos = new ArrayList<>();
         for (UserEntity userEntity: userEntityList) {
-            UserDto userDto = new UserDto();
-            userDto.setUserName(userEntity.getUserName());
-            userDto.setUserId(userEntity.getId());
-            allUserDtos.add(userDto);
+            allUserDtos.add(new UserDto(userEntity.getUserName(), userEntity.getId()));
         }
-        response.setAllUsers(allUserDtos);
-        SocketCommandDto<ServerFetchAllUsersResponseDto> socketResponse = new SocketCommandDto<>();
-        socketResponse.setUuid(message.getUuid());
-        socketResponse.setCommandType(CommandType.SERVER_FETCH_ALL_USERS_RESPONSE.name());
-        socketResponse.setCommand(response);
+        ServerFetchAllUsersResponseDto response = new ServerFetchAllUsersResponseDto(allUserDtos);
+        SocketCommandDto<ServerFetchAllUsersResponseDto> socketResponse = new SocketCommandDto<>(message.getUuid(),
+                CommandType.SERVER_FETCH_ALL_USERS_RESPONSE.name(), response);
         try {
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketResponse)));
         } catch (IOException e) {

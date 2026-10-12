@@ -33,12 +33,9 @@ public class ClientSelfIdentifyHandler implements ICommandHandler {
         log.info("{} parsed command dto {}", message.getUuid(),clientSelfIdentifyDto);
         session.getAttributes().put(WebsocketSessionKeys.SESSION_USER_ID, clientSelfIdentifyDto.getUserId());
         redisSubscriptionManager.subscribe(KeyUtil.getRedisUserTopicName(clientSelfIdentifyDto.getUserId()));
-        ServerClientSelfIdentifyResponseDto response = new ServerClientSelfIdentifyResponseDto();
-        response.setUserId(clientSelfIdentifyDto.getUserId());
-        SocketCommandDto<ServerClientSelfIdentifyResponseDto> socketResponse = new SocketCommandDto<>();
-        socketResponse.setUuid(message.getUuid());
-        socketResponse.setCommandType(CommandType.SERVER_SELF_IDENTIFY_RESPONSE.name());
-        socketResponse.setCommand(response);
+        ServerClientSelfIdentifyResponseDto response = new ServerClientSelfIdentifyResponseDto(clientSelfIdentifyDto.getUserId());
+        SocketCommandDto<ServerClientSelfIdentifyResponseDto> socketResponse = new SocketCommandDto<>(message.getUuid(),
+                CommandType.SERVER_SELF_IDENTIFY_RESPONSE.name(), response);
         try {
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketResponse)));
         } catch (IOException e) {

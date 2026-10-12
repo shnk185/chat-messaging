@@ -26,9 +26,7 @@ public class ChatService {
 
     @Transactional
     public MessageDto persistChatMessage(Long senderUserId, ClientSendMessageToChatDto clientSendMessageToChatDto) {
-        MessageEntity messageEntity = new MessageEntity();
-        messageEntity.setContent(clientSendMessageToChatDto.getContent());
-        messageEntity.setUserId(senderUserId);
+        MessageEntity messageEntity = new MessageEntity(senderUserId, clientSendMessageToChatDto.getContent());
         messageRepository.save(messageEntity);
 
         Set<Long> receiverIds = new HashSet<>();
@@ -36,30 +34,23 @@ public class ChatService {
         if (chatMemberEntityList != null) {
             for (ChatMemberEntity member: chatMemberEntityList) {
                 if (member.getUserId().equals(senderUserId)) continue;
-                InboxEntity inboxEntity = new InboxEntity();
-                inboxEntity.setMessageId(messageEntity.getId());
-                inboxEntity.setDelivered(false);
-                inboxEntity.setReceiverId(member.getUserId());
-                inboxEntity.setSenderId(senderUserId);
-                inboxEntity.setChatId(clientSendMessageToChatDto.getChatId());
+                InboxEntity inboxEntity = InboxEntity.builder().messageId(messageEntity.getId())
+                        .delivered(false).receiverId(member.getUserId()).senderId(senderUserId)
+                        .chatId(clientSendMessageToChatDto.getChatId()).build();
                 inboxRepository.save(inboxEntity);
                 receiverIds.add(member.getUserId());
             }
         }
 
-        MessageDto messageDto = new MessageDto();
-        messageDto.setContent(messageEntity.getContent());
-        messageDto.setMessageId(messageEntity.getId());
-        messageDto.setUserId(messageEntity.getUserId());
-        messageDto.setChatId(clientSendMessageToChatDto.getChatId());
-        messageDto.setContent(messageEntity.getContent());
-        messageDto.setReceiverIds(receiverIds);
-        return messageDto;
+        return MessageDto.builder().content(messageEntity.getContent()).messageId(messageEntity.getId())
+                .userId(messageEntity.getUserId()).chatId(clientSendMessageToChatDto.getChatId()).receiverIds(receiverIds)
+                .build();
     }
 
     @Transactional
     public void processMessageAcknowledge(ClientAcknowledgeMessageReceivedDto acknowledgeDto, Long receiverId) {
-        InboxEntity inboxEntity = inboxRepository.findByChatIdAndReceiverIdAndMessageId(acknowledgeDto.getChatId(), receiverId, acknowledgeDto.getMessageId());
+        InboxEntity inboxEntity = inboxRepository.findByChatIdAndReceiverIdAndMessageId(acknowledgeDto.getChatId(),
+                receiverId, acknowledgeDto.getMessageId());
         inboxEntity.setDelivered(true);
         inboxRepository.save(inboxEntity);
         if (!inboxRepository.existsByMessageIdAndDeliveredFalse(acknowledgeDto.getMessageId())) {
@@ -72,12 +63,9 @@ public class ChatService {
         List<InboxEntity> inboxEntities = inboxRepository.findByReceiverIdAndDeliveredFalse(receiverUserId);
         for (InboxEntity inboxEntity: inboxEntities) {
             MessageEntity messageEntity = messageRepository.findById(inboxEntity.getMessageId()).get();
-            IncomingMessageDto incomingMessageDto = new IncomingMessageDto();
-            incomingMessageDto.setSenderId(inboxEntity.getSenderId());
-            incomingMessageDto.setMessageId(inboxEntity.getMessageId());
-            incomingMessageDto.setContent(messageEntity.getContent());
-            incomingMessageDto.setChatId(inboxEntity.getChatId());
-            incomingMessageDto.setReceiverId(receiverUserId);
+            IncomingMessageDto incomingMessageDto = IncomingMessageDto.builder().senderId(inboxEntity.getSenderId())
+                    .messageId(inboxEntity.getMessageId()).content(messageEntity.getContent())
+                    .chatId(inboxEntity.getChatId()).receiverId(receiverUserId).build();
             pendingMessages.computeIfAbsent(inboxEntity.getChatId(), x -> new ArrayList<>()).add(incomingMessageDto);
         }
         return pendingMessages;

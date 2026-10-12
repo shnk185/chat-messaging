@@ -39,14 +39,13 @@ public class ClientSendMessageToChatHandler implements ICommandHandler {
         ClientSendMessageToChatDto clientSendMessageToChatDto = objectMapper.treeToValue(message.getCommand(), ClientSendMessageToChatDto.class);
         log.info("{} parsed command dto {}", message.getUuid(), clientSendMessageToChatDto);
         Long senderUserId = (Long) session.getAttributes().get(WebsocketSessionKeys.SESSION_USER_ID);
+
         MessageDto messageDto = chatService.persistChatMessage(senderUserId, clientSendMessageToChatDto);
         sendMessageToReceivers(message, sessions, messageDto, senderUserId);
-        ServerSendMessageToChatResponseDto response = new ServerSendMessageToChatResponseDto();
-        response.setMessage(messageDto);
-        SocketCommandDto<ServerSendMessageToChatResponseDto> socketResponse = new SocketCommandDto<>();
-        socketResponse.setUuid(message.getUuid());
-        socketResponse.setCommandType(CommandType.SERVER_SEND_MESSAGE_TO_CHAT_RESPONSE.name());
-        socketResponse.setCommand(response);
+
+        ServerSendMessageToChatResponseDto response = new ServerSendMessageToChatResponseDto(messageDto);
+        SocketCommandDto<ServerSendMessageToChatResponseDto> socketResponse = new
+                SocketCommandDto<>(message.getUuid(), CommandType.SERVER_SEND_MESSAGE_TO_CHAT_RESPONSE.name(), response);
         try {
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketResponse)));
         } catch (IOException e) {
@@ -62,18 +61,13 @@ public class ClientSendMessageToChatHandler implements ICommandHandler {
                 if (userSession.getAttributes().get(WebsocketSessionKeys.SESSION_USER_ID) == null) continue;
                 Long sessionUserId = (Long) userSession.getAttributes().get(WebsocketSessionKeys.SESSION_USER_ID);
                 if (receiverId.equals(sessionUserId)) {
-                    IncomingMessageDto incomingMessageDto = new IncomingMessageDto();
-                    incomingMessageDto.setMessageId(messageDto.getMessageId());
-                    incomingMessageDto.setContent(messageDto.getContent());
-                    incomingMessageDto.setChatId(messageDto.getChatId());
-                    incomingMessageDto.setReceiverId(sessionUserId);
-                    incomingMessageDto.setSenderId(senderUserId);
-                    ServerPushMessageToChatDto response = new ServerPushMessageToChatDto();
-                    response.setIncomingMessage(incomingMessageDto);
-                    SocketCommandDto<ServerPushMessageToChatDto> socketResponse = new SocketCommandDto<>();
-                    socketResponse.setUuid(message.getUuid());
-                    socketResponse.setCommandType(CommandType.SERVER_PUSH_MESSAGE_TO_CHAT.name());
-                    socketResponse.setCommand(response);
+                    IncomingMessageDto incomingMessageDto = IncomingMessageDto.builder().messageId(messageDto.getMessageId())
+                            .content(messageDto.getContent()).chatId(messageDto.getChatId()).receiverId(sessionUserId)
+                            .senderId(senderUserId).build();
+
+                    ServerPushMessageToChatDto response = new ServerPushMessageToChatDto(incomingMessageDto);
+                    SocketCommandDto<ServerPushMessageToChatDto> socketResponse = new SocketCommandDto<>(message.getUuid(),
+                            CommandType.SERVER_PUSH_MESSAGE_TO_CHAT.name(), response);
                     try {
                         userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(socketResponse)));
                     } catch (IOException e) {
@@ -87,16 +81,12 @@ public class ClientSendMessageToChatHandler implements ICommandHandler {
         Set<Long> usersNotConnected = new HashSet<>(messageDto.getReceiverIds());
         usersNotConnected.removeAll(usersConnected);
         for (Long receiverId: usersNotConnected) {
-            InternalSendMessageToChatDto command =  new InternalSendMessageToChatDto();
-            command.setReceiverId(receiverId);
-            command.setContent(messageDto.getContent());
-            command.setChatId(messageDto.getChatId());
-            command.setMessageId(messageDto.getMessageId());
-            command.setSenderId(senderUserId);
-            SocketCommandDto<InternalSendMessageToChatDto> socketCommand = new SocketCommandDto<>();
-            socketCommand.setUuid(message.getUuid());
-            socketCommand.setCommandType(CommandType.INTERNAL_SEND_MESSAGE_TO_CHAT.name());
-            socketCommand.setCommand(command);
+            InternalSendMessageToChatDto command =  InternalSendMessageToChatDto.builder().receiverId(receiverId)
+                    .content(messageDto.getContent()).chatId(messageDto.getChatId()).messageId(messageDto.getMessageId())
+                    .senderId(senderUserId).build();
+
+            SocketCommandDto<InternalSendMessageToChatDto> socketCommand = new SocketCommandDto<>(message.getUuid(),
+                    CommandType.INTERNAL_SEND_MESSAGE_TO_CHAT.name(), command);
             redisTemplate.convertAndSend(KeyUtil.getRedisUserTopicName(receiverId), socketCommand);
         }
     }
